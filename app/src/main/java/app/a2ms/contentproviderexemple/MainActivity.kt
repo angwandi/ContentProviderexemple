@@ -7,8 +7,10 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ArrayAdapter
 
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_main.*
 
 private const val TAG = "MainActivity"
 
@@ -28,6 +30,15 @@ class MainActivity : AppCompatActivity() {
                     null,
                     null,
                     ContactsContract.Contacts.DISPLAY_NAME)
+
+            val contacts = ArrayList<String>() //Create a list of all our contacts
+            cursor?.use {
+                //loop through the cursor
+                while (it.moveToNext())
+                    contacts.add(it.getString(it.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)))
+            }
+            val adapter = ArrayAdapter<String>(this, R.layout.contact_detail, R.id.name, contacts)
+            contact_name.adapter = adapter
             Log.d(TAG, "fab onclick:ends")
         }
     }
