@@ -22,8 +22,6 @@ private const val TAG = "MainActivity"
 private const val REQUEST_CODE_READ_CONTACTS = 1
 
 class MainActivity : AppCompatActivity() {
-//    private var readGranted = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -32,17 +30,13 @@ class MainActivity : AppCompatActivity() {
         val hasReadContactPermission = ContextCompat.checkSelfPermission(this, READ_CONTACTS)
         Log.d(TAG, "onCreate check permission: returned $hasReadContactPermission")
 
-        if (hasReadContactPermission == PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "onCreate: permission granted")
-//            readGranted = true //todo don't do this
-        } else {
+        if (hasReadContactPermission != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "onCreate: requesting permission")
             ActivityCompat.requestPermissions(this, arrayOf(READ_CONTACTS), REQUEST_CODE_READ_CONTACTS)
         }
 
         fab.setOnClickListener { view ->
             Log.d(TAG, "fab onclick: starts")
-//            if (readGranted) {
             if (ContextCompat.checkSelfPermission(this, READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
                 val projection = arrayOf(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)
 
@@ -83,28 +77,6 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "fab onclick:ends")
         }
         Log.d(TAG, "MainActivity: ends")
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        Log.d(TAG, "onRequestPermissionsResult: starts")
-        when (requestCode) {
-            REQUEST_CODE_READ_CONTACTS -> {
-//                readGranted = if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    //permission granted
-                    //contacts-related task we need to do.
-                    Log.d(TAG, "onRequestPermissionsResult: permission granted")
-                } else {
-                    //permission denied
-                    //Disable the functionality that depends on this permission
-                    Log.d(TAG, "onRequestPermissionsResult: permission refused")
-                }
-//                fab.isEnabled = readGranted
-            }
-        }
-        Log.d(TAG, "onRequestPermissionsResult: ends")
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
