@@ -1,8 +1,10 @@
 package app.a2ms.contentproviderexemple
 
 import android.Manifest.permission.READ_CONTACTS
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -26,8 +28,17 @@ class MainActivity : AppCompatActivity() {
         val hasReadContactPermission = ContextCompat.checkSelfPermission(this, READ_CONTACTS)
         Log.d(TAG, "onCreate check permission: returned $hasReadContactPermission")
 
+        if (hasReadContactPermission == PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "onCreate: permission granted")
+            readGranted = true //todo don't do this
+        } else {
+            Log.d(TAG, "onCreate: requesting permission")
+            ActivityCompat.requestPermissions(this, arrayOf(READ_CONTACTS), REQUEST_CODE_READ_CONTACTS)
+        }
+
         fab.setOnClickListener { view ->
             Log.d(TAG, "fab onclick: starts")
+
             val projection = arrayOf(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)
 
             val cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI,
@@ -46,6 +57,28 @@ class MainActivity : AppCompatActivity() {
             contact_name.adapter = adapter
             Log.d(TAG, "fab onclick:ends")
         }
+        Log.d(TAG, "MainActivity: ends")
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        Log.d(TAG, "onRequestPermissionsResult: starts")
+        when (requestCode) {
+            REQUEST_CODE_READ_CONTACTS -> {
+                readGranted = if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //permission granted
+                    //contacts-related task we need to do.
+                    Log.d(TAG, "onRequestPermissionsResult: permission granted")
+                    true
+                } else {
+                    //permission denied
+                    //Disable the functionality that depends on this permission
+                    Log.d(TAG, "onRequestPermissionsResult: permission refused")
+                    false
+                }
+            }
+        }
+        Log.d(TAG, "onRequestPermissionsResult: ends")
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
