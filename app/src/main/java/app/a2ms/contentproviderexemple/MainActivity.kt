@@ -1,9 +1,12 @@
 package app.a2ms.contentproviderexemple
 
 import android.Manifest.permission.READ_CONTACTS
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.provider.Settings
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -12,7 +15,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 
@@ -59,9 +61,23 @@ class MainActivity : AppCompatActivity() {
                 contact_name.adapter = adapter
             } else {
                 Snackbar.make(view, "Please grant access to your Contacts", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Action", {
-                            Toast.makeText(it.context, "Snackbar action clicked", Toast.LENGTH_SHORT).show()
-                        }).show()
+                        .setAction("Grant Access") {
+                            Log.d(TAG, "Snackbar onClick starts")
+                            if (ActivityCompat.shouldShowRequestPermissionRationale(this, READ_CONTACTS)) {
+                                Log.d(TAG, "Snackbar onClick: calling requestPermission")
+                                ActivityCompat.requestPermissions(this, arrayOf(READ_CONTACTS), REQUEST_CODE_READ_CONTACTS)
+                            } else {
+                                //the user permanently denied the permission, take them directly to the app settings
+                                Log.d(TAG, "Snackbar onClick: latching Settings for our App")
+                                val intent = Intent()
+                                intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                                val uri = Uri.fromParts("package", this.packageName, null)
+                                Log.d(TAG, "Snackbar onClick: Uri is $uri")
+                                intent.data = uri
+                                this.startActivity(intent)
+                            }
+                            Log.d(TAG, "Snackbar onClick ends")
+                        }.show()
             }
             Log.d(TAG, "fab onclick:ends")
         }
