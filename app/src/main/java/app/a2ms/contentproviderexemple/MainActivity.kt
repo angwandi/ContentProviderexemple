@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 
@@ -57,8 +58,10 @@ class MainActivity : AppCompatActivity() {
                 val adapter = ArrayAdapter<String>(this, R.layout.contact_detail, R.id.name, contacts)
                 contact_name.adapter = adapter
             } else {
-                Snackbar.make(view, "Please grant access toy our Contacts", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show()
+                Snackbar.make(view, "Please grant access to your Contacts", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Action", {
+                            Toast.makeText(it.context, "Snackbar action clicked", Toast.LENGTH_SHORT).show()
+                        }).show()
             }
             Log.d(TAG, "fab onclick:ends")
         }
@@ -81,7 +84,6 @@ class MainActivity : AppCompatActivity() {
                     false
                 }
 //                fab.isEnabled = readGranted
-
             }
         }
         Log.d(TAG, "onRequestPermissionsResult: ends")
